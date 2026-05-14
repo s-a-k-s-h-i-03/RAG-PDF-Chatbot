@@ -3,6 +3,10 @@ import streamlit as st
 from utils.pdf_loader import extract_text_from_pdf
 from utils.text_splitter import split_text_into_chunks
 from utils.embeddings import get_embedding_model
+from utils.vector_store import (
+    create_vector_store,
+    save_vector_store
+)
 
 st.set_page_config(page_title="RAG PDF Chatbot")
 
@@ -35,12 +39,15 @@ if uploaded_file is not None:
 
     embedding_model = get_embedding_model()
 
-    sample_embedding = embedding_model.embed_query(chunks[0])
+    st.info("Creating embeddings and FAISS vector store...")
 
-    st.subheader("Embedding Information")
+    vector_store = create_vector_store(
+        chunks,
+        embedding_model
+    )
 
-    st.write(f"Embedding Vector Size: {len(sample_embedding)}")
+    save_vector_store(vector_store)
 
-    st.write("First 10 Values of Embedding Vector:")
+    st.success("FAISS vector store created successfully!")
 
-    st.write(sample_embedding[:10])
+    st.write("Vector database saved locally.")
