@@ -7,6 +7,7 @@ from utils.vector_store import (
     create_vector_store,
     save_vector_store
 )
+from utils.retriever import retrieve_relevant_chunks
 
 st.set_page_config(page_title="RAG PDF Chatbot")
 
@@ -23,23 +24,9 @@ if uploaded_file is not None:
 
     extracted_text = extract_text_from_pdf(uploaded_file)
 
-    st.subheader("Extracted Text Preview")
-
-    st.text_area(
-        "PDF Content",
-        extracted_text[:3000],
-        height=200
-    )
-
     chunks = split_text_into_chunks(extracted_text)
 
-    st.subheader("Chunk Information")
-
-    st.write(f"Total Chunks Created: {len(chunks)}")
-
     embedding_model = get_embedding_model()
-
-    st.info("Creating embeddings and FAISS vector store...")
 
     vector_store = create_vector_store(
         chunks,
@@ -48,6 +35,29 @@ if uploaded_file is not None:
 
     save_vector_store(vector_store)
 
-    st.success("FAISS vector store created successfully!")
+    st.success("FAISS vector store created!")
 
-    st.write("Vector database saved locally.")
+    st.subheader("Ask Questions From PDF")
+
+    user_question = st.text_input(
+        "Enter your question"
+    )
+
+    if user_question:
+
+        retrieved_docs = retrieve_relevant_chunks(
+            vector_store,
+            user_question
+        )
+
+        st.subheader("Retrieved Chunks")
+
+        for i, doc in enumerate(retrieved_docs):
+
+            st.write(f"Chunk {i+1}")
+
+            st.text_area(
+                f"Retrieved Text {i+1}",
+                doc.page_content,
+                height=200
+            )
