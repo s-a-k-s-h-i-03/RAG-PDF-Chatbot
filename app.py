@@ -2,6 +2,7 @@ import streamlit as st
 
 from utils.pdf_loader import extract_text_from_pdf
 from utils.text_splitter import split_text_into_chunks
+from utils.embeddings import get_embedding_model
 
 st.set_page_config(page_title="RAG PDF Chatbot")
 
@@ -23,7 +24,7 @@ if uploaded_file is not None:
     st.text_area(
         "PDF Content",
         extracted_text[:3000],
-        height=250
+        height=200
     )
 
     chunks = split_text_into_chunks(extracted_text)
@@ -32,12 +33,14 @@ if uploaded_file is not None:
 
     st.write(f"Total Chunks Created: {len(chunks)}")
 
-    if len(chunks) > 0:
+    embedding_model = get_embedding_model()
 
-        st.subheader("Sample Chunk")
+    sample_embedding = embedding_model.embed_query(chunks[0])
 
-        st.text_area(
-            "Chunk Preview",
-            chunks[0],
-            height=250
-        )
+    st.subheader("Embedding Information")
+
+    st.write(f"Embedding Vector Size: {len(sample_embedding)}")
+
+    st.write("First 10 Values of Embedding Vector:")
+
+    st.write(sample_embedding[:10])
