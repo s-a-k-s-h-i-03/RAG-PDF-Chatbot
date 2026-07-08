@@ -42,6 +42,7 @@ Main documents:
 - [Tech Stack](/C:/Users/saksh/RAG-PDF-Chatbot/docs/tech-stack.md)
 - [Improvements](/C:/Users/saksh/RAG-PDF-Chatbot/docs/improvements.md)
 - [Developer Guide](/C:/Users/saksh/RAG-PDF-Chatbot/docs/developer-guide.md)
+- [Self-Hosted Deployment](/C:/Users/saksh/RAG-PDF-Chatbot/docs/deployment-self-hosted.md)
 
 ## Current Features
 

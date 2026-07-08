@@ -1,0 +1,40 @@
+name: Deploy To Linux VM
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure SSH key
+        shell: bash
+        run: |
+          DEPLOY_PORT="${{ secrets.DEPLOY_PORT }}"
+          if [ -z "$DEPLOY_PORT" ]; then
+            DEPLOY_PORT="22"
+          fi
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "$DEPLOY_PORT" -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy on server
+        shell: bash
+        run: |
+          DEPLOY_PORT="${{ secrets.DEPLOY_PORT }}"
+          DEPLOY_APP_DIR="${{ secrets.DEPLOY_APP_DIR }}"
+          if [ -z "$DEPLOY_PORT" ]; then
+            DEPLOY_PORT="22"
+          fi
+          if [ -z "$DEPLOY_APP_DIR" ]; then
+            DEPLOY_APP_DIR="/opt/rag-pdf-chatbot"
+          fi
+          ssh -p "$DEPLOY_PORT" "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+            "APP_DIR='$DEPLOY_APP_DIR' BRANCH='main' SERVICE_NAME='rag-pdf-chatbot' OLLAMA_MODEL='tinyllama' bash '$DEPLOY_APP_DIR/deploy/ubuntu-vm/update.sh'"
