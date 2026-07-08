@@ -4,3 +4,8 @@ __pycache__/
 vectorstore/
 uploaded_pdfs/
 *.pyc
+.tmp-pip/
+pytest-cache-files-*/
+streamlit-ui.out.log
+streamlit-ui.err.log
+tmp_frame_*.png
